@@ -1,0 +1,224 @@
+# ─────────────────────────────────────────────
+# HP ZGX Competitive Landscape
+# Organized by product tier: Fury vs Nano competitors
+# ─────────────────────────────────────────────
+
+competitors:
+  # ── FURY COMPETITORS ──────────────────────────
+  - name: Dell
+    tier: fury
+    query_templates:
+      - "Dell AI workstation product launch 2026"
+      - "Dell on-premises inference announcement"
+      - "Dell ITAR FedRAMP AI compliance"
+      - "Dell edge AI defense contract"
+    products:
+      - name: "Dell Pro Max GB300"
+        tier: fury
+        url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-max-with-gb300/spd/dell-pro-max-fct6263-desktop"
+        queries:
+          - "Dell Pro Max GB300"
+          - "Dell Pro Max GB300 specs pricing"
+          - "Dell Pro Max GB300 review"
+      - name: "Dell Pro Max GB10"
+        tier: nano
+        queries:
+          - "Dell Pro Max GB10"
+          - "Dell Pro Max GB10 specs pricing"
+
+  - name: ASUS
+    tier: both
+    query_templates:
+      - "ASUS AI workstation 2026"
+      - "ASUS enterprise AI hardware announcement"
+    products:
+      - name: "ASUS ExpertCenter Pro ET900N G3"
+        tier: fury
+        url: "https://www.asus.com/displays-desktops/workstations/performance/expertcenter-pro-et900n-g3/"
+        queries:
+          - "ASUS ExpertCenter Pro ET900N G3"
+          - "ASUS ET900N G3 specs pricing"
+      - name: "ASUS Ascent GX10"
+        tier: nano
+        queries:
+          - "ASUS Ascent GX10"
+          - "ASUS Ascent GX10 specs pricing"
+
+  - name: NVIDIA
+    tier: both
+    query_templates:
+      - "NVIDIA DGX workstation 2026"
+      - "NVIDIA AI workstation announcement"
+    products:
+      - name: "NVIDIA DGX Station"
+        tier: fury
+        url: "https://www.nvidia.com/en-us/products/workstations/dgx-station/"
+        queries:
+          - "NVIDIA DGX Station"
+          - "NVIDIA DGX Station specs pricing availability"
+      - name: "NVIDIA DGX Spark"
+        tier: nano
+        queries:
+          - "NVIDIA DGX Spark"
+          - "NVIDIA DGX Spark specs pricing availability"
+
+  - name: MSI
+    tier: both
+    query_templates:
+      - "MSI AI workstation 2026"
+      - "MSI enterprise AI edge hardware"
+    products:
+      - name: "MSI XpertStation WS300"
+        tier: fury
+        queries:
+          - "MSI XpertStation WS300"
+          - "MSI XpertStation WS300 specs"
+      - name: "MSI CT60-S8060"
+        tier: fury
+        queries:
+          - "MSI CT60-S8060"
+      - name: "MSI EdgeXpert"
+        tier: nano
+        queries:
+          - "MSI EdgeXpert AI"
+          - "MSI EdgeXpert specs pricing"
+
+  - name: Supermicro
+    tier: fury
+    query_templates:
+      - "Supermicro AI workstation 2026"
+      - "Supermicro GPU server announcement"
+    products:
+      - name: "Supermicro Super AI Station"
+        tier: fury
+        queries:
+          - "Supermicro Super AI Station"
+          - "Supermicro Super AI Station specs pricing"
+
+  - name: Gigabyte
+    tier: both
+    query_templates:
+      - "Gigabyte AI workstation 2026"
+      - "Gigabyte enterprise AI hardware"
+    products:
+      - name: "Gigabyte W775-V10-L01"
+        tier: fury
+        queries:
+          - "Gigabyte W775-V10-L01"
+          - "Gigabyte W775 AI workstation"
+      - name: "Gigabyte AI Top ATOM"
+        tier: nano
+        queries:
+          - "Gigabyte AI Top ATOM"
+          - "Gigabyte AI Top ATOM specs pricing"
+
+  - name: Lenovo
+    tier: nano
+    query_templates:
+      - "Lenovo AI workstation product launch 2026"
+      - "Lenovo edge AI hardware announcement"
+    products:
+      - name: "Lenovo ThinkStation PGX"
+        tier: nano
+        queries:
+          - "Lenovo ThinkStation PGX"
+          - "Lenovo ThinkStation PGX specs pricing"
+
+  - name: HPE
+    tier: fury
+    query_templates:
+      - "HPE AI workstation edge inference 2026"
+      - "HPE on-premises AI announcement"
+    products:
+      - name: "HPE ProLiant DL380a"
+        tier: fury
+        queries:
+          - "HPE ProLiant DL380a GPU AI"
+
+# Cross-cutting queries that aren't competitor-specific.
+# These catch new entrants and industry trends.
+market_queries:
+  - "on-premises AI workstation comparison 2026"
+  - "air-gapped AI inference hardware"
+  - "NVIDIA Blackwell workstation OEM"
+  - "NVIDIA GB10 Grace Blackwell desktop"
+  - "FedRAMP AI workstation approved"
+  - "edge AI hardware defense contract award 2026"
+  - "GB300 AI workstation"
+
+# Pre-filter: results must contain at least one keyword from this list
+# in their title or snippet to pass to the Collector agent.
+relevance_keywords:
+  - "ai"
+  - "inference"
+  - "workstation"
+  - "gpu"
+  - "edge"
+  - "on-prem"
+  - "on-premises"
+  - "data sovereignty"
+  - "air-gap"
+  - "itar"
+  - "fedramp"
+  - "blackwell"
+  - "grace"
+  - "tops"
+  - "vram"
+  - "dgx"
+  - "gb10"
+  - "gb300"
+
+# SearXNG search settings
+search_settings:
+  time_range: "week"
+  categories: "general,news,it"
+  max_results_per_query: 2
+
+hp_positioning:
+  core_narrative: >
+    Compliance by Architecture: HP ZGX Nano and ZGX Fury deliver
+    AI inference entirely on-premises, eliminating cloud dependencies.
+    Data never leaves the device. This is not a policy, it is an
+    architectural guarantee.
+
+  products:
+    zgx_nano:
+      chip: "NVIDIA GB10 Grace Blackwell Superchip"
+      arch: "ARM64/aarch64"
+      memory: "128GB unified"
+      tops: "~1000"
+      compute_capability: "sm_121"
+      competes_with:
+        - "Dell Pro Max GB10"
+        - "ASUS Ascent GX10"
+        - "Lenovo ThinkStation PGX"
+        - "NVIDIA DGX Spark"
+        - "Gigabyte AI Top ATOM"
+        - "MSI EdgeXpert"
+
+    zgx_fury:
+      chip: "NVIDIA Blackwell Ultra"
+      memory: "748GB coherent"
+      cooling: "Liquid-cooled"
+      price_range: "~$100K"
+      competes_with:
+        - "Dell Pro Max GB300"
+        - "ASUS ExpertCenter Pro ET900N G3"
+        - "NVIDIA DGX Station"
+        - "MSI XpertStation WS300"
+        - "MSI CT60-S8060"
+        - "Supermicro Super AI Station"
+        - "Gigabyte W775-V10-L01"
+
+  target_verticals:
+    - federal/defense
+    - healthcare
+    - SLED
+    - manufacturing
+
+  differentiators:
+    - "Compliance by Architecture (not policy)"
+    - "Procurement accelerator for regulated industries"
+    - "No cloud dependency for inference"
+    - "Runs production models locally (Qwen3.6-35B-A3B, Mixtral-8x7B)"
+    - "Containerized demo portfolio proves real workloads"
