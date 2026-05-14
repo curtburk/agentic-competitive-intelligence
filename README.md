@@ -14,7 +14,7 @@ An agentic workflow that monitors competitor activity in the on-prem AI hardware
 
 ```bash
 ci-toggle       # toggle containers on/off (run from any directory on the Nano)
-ci              # open the TUI dashboard (run from any directory on the Nano)
+ci              # open the TUI dashboard (SSH into the Nano and then run from any directory on the Nano)
 ```
 
 `ci-toggle` is a toggle switch. If the pipeline is running, it stops it and frees GPU memory. If it's stopped, it starts it and waits for the model to load. You need to stop the pipeline before running other GPU-heavy apps (AI Bridge, demos, etc).
