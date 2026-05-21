@@ -186,7 +186,7 @@ async def call_agent(
                         ],
                         "temperature": 0.3,
                         "max_tokens": 4096,
-                        "response_format": {"type": "json_schema", "json_schema": {"name": response_model.__name__, "schema": schema}},
+                        "guided_json": json.dumps(schema),
                     },
                 )
                 resp.raise_for_status()
@@ -198,6 +198,91 @@ async def call_agent(
 
                 raw = result["choices"][0]["message"]["content"]
                 parsed = json.loads(raw)
+
+                # Handle models that use alternative field names
+                if response_model.__name__ == "CollectorOutput":
+                    # Find the sources list regardless of field name
+                    if "sources" not in parsed:
+                        for key in list(parsed.keys()):
+                            val = parsed[key]
+                            if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict):
+                                parsed["sources"] = val
+                                break
+
+                    # Normalize each source item's field names
+                    field_aliases = {
+                        "title": ["title", "name", "heading"],
+                        "url": ["url", "link", "href", "source_url"],
+                        "snippet": ["snippet", "content", "description", "summary", "text", "excerpt"],
+                        "competitor": ["competitor", "company", "vendor", "brand"],
+                        "relevance_note": ["relevance_note", "relevance", "note", "reason", "why_relevant", "relevance_reason"],
+                    }
+
+                    normalized_sources = []
+                    for src in parsed.get("sources", []):
+                        normalized = {}
+                        for target_field, aliases in field_aliases.items():
+                            for alias in aliases:
+                                if alias in src:
+                                    normalized[target_field] = src[alias]
+                                    break
+                            if target_field not in normalized:
+                                normalized[target_field] = ""
+                        normalized_sources.append(normalized)
+
+                    parsed["sources"] = normalized_sources
+
+                # Handle StrategistOutput field type mismatches
+                if response_model.__name__ == "StrategistOutput":
+                    # Remap list names if needed
+                    if "positioning_comparisons" not in parsed:
+                        for key in list(parsed.keys()):
+                            val = parsed[key]
+                            if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict) and any(k in val[0] for k in ["competitor", "their_narrative", "narrative"]):
+                                parsed["positioning_comparisons"] = val
+                                break
+                    if "threats_and_opportunities" not in parsed:
+                        for key in list(parsed.keys()):
+                            val = parsed[key]
+                            if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict) and any(k in val[0] for k in ["type", "urgency", "threat"]):
+                                parsed["threats_and_opportunities"] = val
+                                break
+                    # Coerce list-typed fields to strings
+                    for comp in parsed.get("positioning_comparisons", []):
+                        for field in ["competitor", "their_narrative", "hp_advantage", "hp_gap", "recommended_response"]:
+                            val = comp.get(field)
+                            if isinstance(val, list):
+                                comp[field] = " ".join(str(v) for v in val)
+                    for item in parsed.get("threats_and_opportunities", []):
+                        for field in ["type", "description", "urgency"]:
+                            val = item.get(field)
+                            if isinstance(val, list):
+                                item[field] = " ".join(str(v) for v in val)
+
+                # Handle AnalystOutput field type mismatches
+                if response_model.__name__ == "AnalystOutput":
+                    for finding in parsed.get("findings", []):
+                        # specs_mentioned: model sometimes returns list instead of dict
+                        specs = finding.get("specs_mentioned", {})
+                        if isinstance(specs, list):
+                            finding["specs_mentioned"] = {f"spec_{i}": str(v) for i, v in enumerate(specs)}
+                        elif not isinstance(specs, dict):
+                            finding["specs_mentioned"] = {}
+
+                        # target_verticals: ensure it's a list
+                        verts = finding.get("target_verticals", [])
+                        if isinstance(verts, str):
+                            finding["target_verticals"] = [verts]
+                        elif not isinstance(verts, list):
+                            finding["target_verticals"] = []
+
+                        # source_urls: ensure it's a list
+                        urls = finding.get("source_urls", [])
+                        if isinstance(urls, str):
+                            finding["source_urls"] = [urls]
+                        elif not isinstance(urls, list):
+                            finding["source_urls"] = []
+
                 validated = response_model(**parsed)
                 trace.validation_passed = True
                 return validated.model_dump()
@@ -411,12 +496,6 @@ async def run_pipeline(config: dict) -> dict:
     )
     all_traces.append(trace.finish())
 
-    if brief is not None:
-        now = datetime.utcnow()
-        brief["generated_at"] = now.isoformat()
-        brief["period_covered"] = f"Week of {now.strftime('%Y-%m-%d')}"
-        brief["run_id"] = run_id
-
     if brief is None:
         save_trace(run_id, all_traces)
         publish_to_wiki(brief=None, analyst_output=analyst_output, strategist_output=strategist_output)
@@ -506,7 +585,7 @@ async def query_wiki(request: dict):
                         {"role": "user", "content": prompt},
                     ],
                     "temperature": 0.2,
-                    "max_tokens": 4096,
+                    "max_tokens": 2048,
                 },
             )
             resp.raise_for_status()
@@ -528,6 +607,14 @@ async def enrich_endpoint(request: dict):
     """
     Enrich a competitor product profile by searching the web,
     fetching product pages, and extracting structured specs.
+
+    Body: {
+        "competitor": "Dell",
+        "product_name": "Pro Max GB10",
+        "product_tier": "nano",
+        "url": "https://dell.com/..."  (optional, direct product page)
+    }
+    Returns: {"status": "complete", "specs_extracted": 8, ...}
     """
     competitor = request.get("competitor", "")
     product_name = request.get("product_name", "")
@@ -547,3 +634,19 @@ async def enrich_endpoint(request: dict):
         url=url,
     )
     return result
+
+
+@app.get("/provenance/{competitor}/{product_name}")
+async def get_provenance(competitor: str, product_name: str):
+    """
+    Get the provenance map for a specific competitor product.
+    Shows where every claim came from (URL, date, context).
+
+    Example: GET /provenance/Dell/Pro%20Max%20GB300
+    """
+    from provenance import load_provenance
+    record = load_provenance(competitor, product_name)
+    if not record.claims:
+        return {"status": "no provenance data", "competitor": competitor, "product_name": product_name}
+    return record.model_dump()
+

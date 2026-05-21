@@ -36,24 +36,31 @@ class EnrichedProfile(BaseModel):
         description="2-3 sentence overview of the product and its market position"
     )
     specs: dict[str, str] = Field(
+        default_factory=dict,
         description="Key specs: GPU, CPU, memory, TOPS, cooling, form factor, etc."
     )
     pricing: str = Field(
+        default="Unknown",
         description="Price or price range if found"
     )
     availability: str = Field(
+        default="Unknown",
         description="Available now, preorder, announced, etc."
     )
     target_verticals: list[str] = Field(
+        default_factory=list,
         description="Which verticals this product targets"
     )
     positioning_language: str = Field(
+        default="",
         description="How the competitor describes this product (their words, not ours)"
     )
     hp_comparison_notes: str = Field(
+        default="",
         description="How this compares to the relevant HP ZGX product"
     )
     sources: list[str] = Field(
+        default_factory=list,
         description="URLs used to build this profile"
     )
 
@@ -354,5 +361,19 @@ async def enrich_product(
     result["specs_extracted"] = len(profile.specs)
     result["pricing"] = profile.pricing
     result["availability"] = profile.availability
+
+    # Step 4: Build provenance map
+    try:
+        from provenance import build_provenance_from_enrichment
+        prov_record = build_provenance_from_enrichment(
+            competitor=competitor,
+            product_name=product_name,
+            profile_data=profile.model_dump(),
+            sources=sources,
+        )
+        result["provenance_claims"] = len(prov_record.claims)
+    except Exception as e:
+        logger.warning(f"Provenance tracking failed: {e}")
+        result["provenance_claims"] = 0
 
     return result

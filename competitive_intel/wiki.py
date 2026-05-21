@@ -135,10 +135,9 @@ def write_weekly_brief(brief: dict):
     points = brief.get("talking_points", [])
 
     filepath = briefs_dir / f"{period.replace(' ', '-').lower()}.md"
-
     talking_points = "\n".join(f"- {tp}" for tp in points)
 
-    content = f"""# Competitive Brief: {period}
+    file_content = f"""# Competitive Brief: {period}
 
 **Run ID**: {run_id}
 **Generated**: {generated}
@@ -157,7 +156,7 @@ def write_weekly_brief(brief: dict):
 
 {talking_points}
 """
-    filepath.write_text(content)
+    filepath.write_text(file_content)
     return filepath
 
 
@@ -215,7 +214,7 @@ def publish_to_wiki(brief: dict | None, analyst_output: dict, strategist_output:
     brief can be None if the Writer failed (partial save).
     """
     run_id = brief["run_id"] if brief else "partial"
-    run_date = str(brief["generated_at"])[:10] if brief else datetime.utcnow().strftime("%Y-%m-%d")
+    run_date = str(brief.get("generated_at", datetime.utcnow().isoformat()))[:10] if brief else datetime.utcnow().strftime("%Y-%m-%d")
 
     files_written = []
 
@@ -226,6 +225,16 @@ def publish_to_wiki(brief: dict | None, analyst_output: dict, strategist_output:
             files_written.append(str(f))
         except Exception as e:
             logger.warning(f"Failed to write finding to wiki: {e}")
+
+        try:
+            from provenance import build_provenance_from_finding
+            build_provenance_from_finding(
+                competitor=finding.competitor,
+                product_name=finding.competitor,
+                finding_data=finding_data,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to track provenance for finding: {e}")
 
     for comp_data in strategist_output["positioning_comparisons"]:
         comp = PositioningComparison(**comp_data)
@@ -245,6 +254,7 @@ def publish_to_wiki(brief: dict | None, analyst_output: dict, strategist_output:
 
     if brief is not None:
         try:
+            # brief passed directly as dict
             f = write_weekly_brief(brief)
             files_written.append(str(f))
         except Exception as e:

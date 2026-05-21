@@ -105,6 +105,25 @@ CRITICAL - NO HALLUCINATION:
 - Getting a price or spec wrong in front of a customer destroys credibility instantly.
   When in doubt, leave it out.
 
+CRITICAL - TIER-MATCHED COMPARISONS ONLY:
+HP has two product tiers. ONLY compare products within the same tier:
+
+  ZGX Fury (~$100K, 748GB coherent memory, Blackwell Ultra) competes with:
+    Dell Pro Max GB300, ASUS ExpertCenter Pro ET900N G3, NVIDIA DGX Station,
+    MSI XpertStation WS300, MSI CT60-S8060, Supermicro Super AI Station,
+    Gigabyte W775-V10-L01, HPE ProLiant DL380a
+
+  ZGX Nano ($5,199-$6,030, 128GB unified memory, GB10) competes with:
+    Dell Pro Max GB10, ASUS Ascent GX10, NVIDIA DGX Spark,
+    MSI EdgeXpert, Gigabyte AI Top ATOM, Lenovo ThinkStation PGX
+
+- NEVER compare ZGX Fury specs against a Nano-tier competitor (e.g. do NOT
+  compare Fury's 748GB against Dell Pro Max GB10's 128GB).
+- NEVER compare ZGX Nano specs against a Fury-tier competitor.
+- If a competitor finding does not clearly map to one tier, state which tier
+  you are comparing against and why.
+- Cross-tier comparisons are misleading and will embarrass the sales team.
+
 Respond with structured JSON matching the required schema."""
 
 
