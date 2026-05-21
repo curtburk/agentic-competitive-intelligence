@@ -1,0 +1,28 @@
+# Data (wiki content, traces, logs)
+data/wiki/briefs/
+data/wiki/competitors/*/2026-*
+data/wiki/competitors/*/provenance-*
+data/wiki/threats/
+data/wiki/opportunities/
+data/wiki/positioning/vs-*
+data/wiki/_index.md
+data/traces.db
+data/cron.log
+
+# Keep seeded files (profiles, HP specs)
+!data/wiki/competitors/*/profile.md
+!data/wiki/positioning/compliance-by-architecture.md
+!data/wiki/positioning/zgx-fury-specs.md
+!data/wiki/positioning/zgx-nano-specs.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Docker
+.env
+
+# OS
+.DS_Store
+Thumbs.db
