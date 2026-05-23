@@ -460,9 +460,40 @@ async def run_pipeline(config: dict) -> dict:
 
     # === NODE 4: STRATEGIST ===
     trace = NodeTrace("strategist", run_id)
+
+    # Load wiki context: competitor profiles, HP specs, previous strategies
+    import glob
+    wiki_root = os.environ.get("WIKI_ROOT", "/data/wiki")
+    wiki_context = {}
+
+    for profile_path in glob.glob(f"{wiki_root}/competitors/*/profile.md"):
+        name = profile_path.split("/")[-2]
+        try:
+            with open(profile_path) as pf:
+                wiki_context[f"profile_{name}"] = pf.read()[:1500]
+        except Exception:
+            pass
+
+    for strat_path in glob.glob(f"{wiki_root}/positioning/strategy-*.md"):
+        name = strat_path.split("/")[-1].replace("strategy-", "").replace(".md", "")
+        try:
+            with open(strat_path) as sf:
+                wiki_context[f"previous_strategy_{name}"] = sf.read()[:1000]
+        except Exception:
+            pass
+
+    for spec_name in ["zgx-fury-specs.md", "zgx-nano-specs.md"]:
+        spec_path = f"{wiki_root}/positioning/{spec_name}"
+        try:
+            with open(spec_path) as sf:
+                wiki_context[f"hp_{spec_name}"] = sf.read()[:1500]
+        except Exception:
+            pass
+
     strategist_input = {
         "analyst_findings": analyst_output,
         "hp_positioning": config["hp_positioning"],
+        "wiki_context": wiki_context,
     }
     strategist_output = await call_agent(
         system_prompt=strategist_prompt(),
@@ -470,6 +501,10 @@ async def run_pipeline(config: dict) -> dict:
         response_model=StrategistOutput,
         trace=trace,
     )
+
+    # Ensure competitor_strategies exists even if model skipped it
+    if strategist_output is not None and "competitor_strategies" not in strategist_output:
+        strategist_output["competitor_strategies"] = {}
     if strategist_output is None:
         all_traces.append(trace.finish())
         save_trace(run_id, all_traces)

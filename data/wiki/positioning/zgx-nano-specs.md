@@ -51,7 +51,13 @@ with zero cloud dependencies.
 
 ## Key Differentiators
 
-- Compliance by Architecture: data never leaves the device
 - Same GB10 silicon as competitors but with HP enterprise support
-- HP is priced at a premium vs MSI ($5,199 vs $3,999)
-- Differentiator must be value-add (support, security, compliance) not price
+- We offer a Fed Nano with the Bluetooth and WiFi antennaes desoldered. We are only OEM with this. 
+- Differentiator must be value-add (support, security, compliance) not price because NVIDIA is cheaper
+- ZGX Toolkit and HP Z Runtime offer tools to get you started with development and inference that are free in opposition to all   other OEMs that offer NVIDIA AI Enterprise which is $625/year/unit
+
+## What are not key differentiators
+
+- The hardware, all OEMs have the same hardware
+- Compliance by Architecture: data never leaves the device; all OEMs can promise that
+-

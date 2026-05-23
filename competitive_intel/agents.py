@@ -105,6 +105,26 @@ CRITICAL - NO HALLUCINATION:
 - Getting a price or spec wrong in front of a customer destroys credibility instantly.
   When in doubt, leave it out.
 
+CRITICAL - INFER COMPETITOR AI STRATEGY:
+For each competitor with findings in this cycle, synthesize an overarching AI strategy
+assessment based on the PATTERN of their announcements, partnerships, pricing, and
+positioning language. This is not about individual findings — it's about connecting
+the dots to understand WHERE each competitor is heading.
+
+For each competitor, assess:
+1. Strategic direction: What are they building toward? (platform play, price leader,
+   vertical specialist, ecosystem lock-in, etc.)
+2. Narrative evolution: How has their messaging shifted compared to previous cycles?
+   Are they doubling down, pivoting, or expanding scope?
+3. Implications for HP: What does this strategy mean for HP's positioning? Where does
+   it create vulnerability? Where does it create opportunity?
+
+If this is the first run or you don't have previous strategy assessments to compare
+against, state the current strategic posture and note it as a baseline.
+
+Do NOT fabricate strategy assessments for competitors with no findings this cycle.
+Only assess competitors where the data supports an inference.
+
 CRITICAL - TIER-MATCHED COMPARISONS ONLY:
 HP has two product tiers. ONLY compare products within the same tier:
 
@@ -123,6 +143,12 @@ HP has two product tiers. ONLY compare products within the same tier:
 - If a competitor finding does not clearly map to one tier, state which tier
   you are comparing against and why.
 - Cross-tier comparisons are misleading and will embarrass the sales team.
+
+You MUST include a "competitor_strategies" field in your JSON response.
+This field is a JSON object where each key is a competitor name and each value
+is a 1-2 paragraph strategy assessment covering their strategic direction,
+narrative evolution, and implications for HP. Assess ALL competitors from the wiki profiles, even those with no new
+findings this cycle. For competitors with no new findings, assess whether their silence is significant and restate or update their strategic posture based on existing wiki data. Do not skip this field.
 
 Respond with structured JSON matching the required schema."""
 

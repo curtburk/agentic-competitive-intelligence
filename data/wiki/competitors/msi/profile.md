@@ -1,14 +1,14 @@
 # MSI - Competitor Profile
 
-**Last Updated**: 2026-05-21
+**Last Updated**: 2026-05-23
 **Threat Level**: To be assessed
-**Tiers**: Nano
+**Tiers**: Fury
 
 ---
 
 ## Overview
 
-The MSI EdgeXpert MS-C931 is a desktop AI supercomputer and workstation appliance built on the NVIDIA DGX Spark platform. It is designed for AI developers, researchers, data analysts, and enterprises requiring local AI inference and model tuning. It positions itself as an 'AI workstation appliance' rather than a standard mini PC, enabling local development of AI solutions with data security and low latency.
+The MSI XpertStation WS300 is a next-generation deskside AI supercomputer built on the NVIDIA DGX Station GB300 architecture. It is purpose-built for large language models (LLMs), generative AI, and advanced data science workloads. The system is designed for enterprises, research labs, and AI teams that require data-center-class performance locally to maintain data sovereignty and avoid cloud reliance.
 
 ## Products
 
@@ -16,20 +16,20 @@ The MSI EdgeXpert MS-C931 is a desktop AI supercomputer and workstation applianc
 - **CT60-S8060** (Fury competitor)
 - **EdgeXpert** (Nano competitor)
 
-## MSI EdgeXpert MS-C931 Specs
+## MSI XpertStation WS300 Specs
 
 No specs extracted.
 
-**Pricing**: Unknown
+**Pricing**: $85,000
 **Availability**: Unknown
 
 ## Target Verticals
 
-Education, Finance, Healthcare, R&D Centers, AI Labs, Data Edge Nodes
+Healthcare, Finance, Defense, Research Labs, Manufacturing/Industrial Inspection (via physical AI/robotics)
 
 ## Their Positioning
 
-Desktop AI supercomputer
+Data-Center-Class AI Power to the Desktop
 
 ## HP ZGX Comparison
 
@@ -37,8 +37,7 @@ No comparison notes extracted.
 
 ## Sources
 
-- NVIDIA DGX Spark is an AI supercomputer that changes the rules of the game in desktop computing.
-- Built for developers, AI researchers and data analysts.
-- This isn’t a 'mini PC.' It’s an AI workstation appliance.
-- Unmatched AI computing power.
-- True data-center-grade performance to the desktop.
+- https://vishalperipherals.com/blogs/pc/msi-ws300-based-on-nvidia-dgx-station-gb300
+- https://finance.yahoo.com/news/msi-launches-xpertstation-ws300-nvidia-203000011.html
+- https://www.manilatimes.net/2026/03/18/tmt-newswire/pr-newswire/gtc-2026-msi-drives-end-to-end-ai-implementation-by-bridging-cloud-computing-and-autonomous-edge-inspection/2302113
+- https://www.techradar.com/pro/msi-re-launches-usd85-000-nvidia-dgx-station-workstation-with-the-nvidia-gb300-ultra-a-pair-of-400gbe-lan-ports-and-768gb-of-ram

@@ -236,6 +236,32 @@ def publish_to_wiki(brief: dict | None, analyst_output: dict, strategist_output:
         except Exception as e:
             logger.warning(f"Failed to track provenance for finding: {e}")
 
+    # Write competitor strategy assessments
+    strategies = strategist_output.get("competitor_strategies", {})
+    if strategies:
+        strategy_dir = WIKI_ROOT / "positioning"
+        strategy_dir.mkdir(parents=True, exist_ok=True)
+        for competitor, assessment in strategies.items():
+            slug = competitor.lower().replace(" ", "-").replace("/", "-")[:40]
+            filepath = strategy_dir / f"strategy-{slug}.md"
+
+            # Read existing strategy to include as "previous assessment"
+            previous = ""
+            if filepath.exists():
+                previous = filepath.read_text()
+
+            file_content = f"# {competitor} — Inferred AI Strategy\n\n"
+            file_content += f"**Last Updated**: {run_date}\n"
+            file_content += f"**Run ID**: {run_id}\n\n---\n\n"
+            file_content += f"## Current Assessment\n\n{assessment}\n"
+
+            if previous and "## Current Assessment" in previous:
+                old_assessment = previous.split("## Current Assessment")[1].split("## Previous Assessment")[0].strip()
+                file_content += f"\n## Previous Assessment\n\n{old_assessment}\n"
+
+            filepath.write_text(file_content)
+            files_written.append(str(filepath))
+
     for comp_data in strategist_output["positioning_comparisons"]:
         comp = PositioningComparison(**comp_data)
         try:

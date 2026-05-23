@@ -24,7 +24,10 @@ inference entirely on-premises with zero cloud dependencies.
 
 ## Key Differentiators
 
-- ARM64 architecture (same as Dell Pro Max GB300, NOT x86)
-- 748GB coherent memory vs Dell's 252GB HBM3e + 496GB LPDDR5X (separate pools)
-- Compliance by Architecture: data never leaves the device
-- Procurement accelerator for regulated industries
+- ZGX Toolkit and HP Z Runtime offer tools to get you started with development and inference that are free in opposition to all   other OEMs that offer NVIDIA AI Enterprise which is $4500/year/unit
+
+## What are not key differentiators
+
+- The hardware, all OEMs have the same hardware
+- Compliance by Architecture: data never leaves the device; all OEMs can promise that
+-
