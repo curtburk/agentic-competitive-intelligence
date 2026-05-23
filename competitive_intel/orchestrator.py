@@ -175,7 +175,7 @@ async def call_agent(
 
     for attempt in range(1 + max_retries):
         try:
-            async with httpx.AsyncClient(timeout=120.0) as client:
+            async with httpx.AsyncClient(timeout=300.0) as client:
                 resp = await client.post(
                     f"{VLLM_URL}/v1/chat/completions",
                     json={
@@ -185,7 +185,7 @@ async def call_agent(
                             {"role": "user", "content": user_content},
                         ],
                         "temperature": 0.3,
-                        "max_tokens": 4096,
+                        "max_tokens": 32768,
                         "guided_json": json.dumps(schema),
                     },
                 )
@@ -248,12 +248,20 @@ async def call_agent(
                                 parsed["threats_and_opportunities"] = val
                                 break
                     # Coerce list-typed fields to strings
+                    # Coerce narrative_health to string
+                    nh = parsed.get("narrative_health", "")
+                    if not isinstance(nh, str):
+                        parsed["narrative_health"] = json.dumps(nh) if nh else "Not assessed"
                     for comp in parsed.get("positioning_comparisons", []):
+                        if not isinstance(comp, dict):
+                            continue
                         for field in ["competitor", "their_narrative", "hp_advantage", "hp_gap", "recommended_response"]:
                             val = comp.get(field)
                             if isinstance(val, list):
                                 comp[field] = " ".join(str(v) for v in val)
                     for item in parsed.get("threats_and_opportunities", []):
+                        if not isinstance(item, dict):
+                            continue
                         for field in ["type", "description", "urgency"]:
                             val = item.get(field)
                             if isinstance(val, list):
@@ -262,6 +270,8 @@ async def call_agent(
                 # Handle AnalystOutput field type mismatches
                 if response_model.__name__ == "AnalystOutput":
                     for finding in parsed.get("findings", []):
+                        if not isinstance(finding, dict):
+                            continue
                         # specs_mentioned: model sometimes returns list instead of dict
                         specs = finding.get("specs_mentioned", {})
                         if isinstance(specs, list):
@@ -315,8 +325,35 @@ async def call_agent(
 
 async def run_pipeline(config: dict) -> dict:
     """Execute the full DAG with error recovery."""
-
     run_id = str(uuid.uuid4())[:8]
+
+    # === PREFLIGHT CHECKS ===
+    # Verify vLLM and SearXNG before running 52 searches
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{VLLM_URL}/v1/chat/completions",
+                json={
+                    "model": VLLM_MODEL,
+                    "messages": [{"role": "user", "content": "Say ok"}],
+                    "temperature": 0.0,
+                    "max_tokens": 32,
+                },
+            )
+            resp.raise_for_status()
+            raw = resp.json()["choices"][0]["message"]["content"]
+            logger.info(f"[preflight] vLLM OK (run {run_id})")
+    except Exception as e:
+        return {"run_id": run_id, "status": "aborted", "nodes_completed": [],
+                "reason": f"Preflight: vLLM failed: {e}"}
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(f"{SEARXNG_URL}/search", params={"q": "test", "format": "json"})
+            resp.raise_for_status()
+            logger.info(f"[preflight] SearXNG OK (run {run_id})")
+    except Exception as e:
+        return {"run_id": run_id, "status": "aborted", "nodes_completed": [],
+                "reason": f"Preflight: SearXNG failed: {e}"}
     previous_summary = load_previous_brief_summary()
     all_traces = []
     result = {"run_id": run_id, "status": "complete", "nodes_completed": []}
@@ -490,10 +527,34 @@ async def run_pipeline(config: dict) -> dict:
         except Exception:
             pass
 
+
+    # Load ALL competitor findings (the actual intelligence)
+    for competitor_dir in glob.glob(f"{wiki_root}/competitors/*/"):
+        name = competitor_dir.rstrip("/").split("/")[-1]
+        findings = sorted(glob.glob(f"{competitor_dir}2026-*.md"))
+        if findings:
+            combined = []
+            for fpath in findings[-10:]:
+                try:
+                    with open(fpath) as ff:
+                        combined.append(ff.read()[:500])
+                except Exception:
+                    pass
+            if combined:
+                wiki_context[f"findings_{name}"] = "\n---\n".join(combined)
+
+    # Load positioning comparisons
+    for vs_path in glob.glob(f"{wiki_root}/positioning/vs-*.md"):
+        name = vs_path.split("/")[-1].replace(".md", "")
+        try:
+            with open(vs_path) as vf:
+                wiki_context[f"positioning_{name}"] = vf.read()[:1000]
+        except Exception:
+            pass
     strategist_input = {
         "analyst_findings": analyst_output,
         "hp_positioning": config["hp_positioning"],
-        "wiki_context": wiki_context,
+
     }
     strategist_output = await call_agent(
         system_prompt=strategist_prompt(),
@@ -502,9 +563,61 @@ async def run_pipeline(config: dict) -> dict:
         trace=trace,
     )
 
-    # Ensure competitor_strategies exists even if model skipped it
-    if strategist_output is not None and "competitor_strategies" not in strategist_output:
-        strategist_output["competitor_strategies"] = {}
+    # Dedicated strategy inference call - separate from main Strategist
+    if strategist_output is not None:
+        try:
+            strategy_prompt = (
+                "You are a competitive intelligence strategist for HP's AI workstation business.\n"
+                "You will receive wiki data about competitors including their product profiles, "
+                "recent findings, and previous strategy assessments.\n\n"
+                "For EACH competitor listed, produce a 2-3 paragraph strategy assessment covering:\n"
+                "1. Strategic direction: What are they building toward?\n"
+                "2. Narrative evolution: How has their approach changed recently?\n"
+                "3. Implications for HP: Where does this create risk or opportunity?\n\n"
+                "Respond with ONLY a JSON object where each key is a competitor name "
+                "and each value is the strategy assessment string. Example:\n"
+                '{"Dell": "Dell is pursuing...", "AMD": "AMD is positioning..."}'
+            )
+            # Sanitize wiki context: remove control characters that break JSON
+            clean_context = {}
+            for k, v in wiki_context.items():
+                if isinstance(v, str):
+                    clean_context[k] = v.replace("\r", " ").replace("\t", " ").replace("\x00", "")
+                else:
+                    clean_context[k] = v
+            strategy_user = json.dumps({
+                "wiki_context": clean_context,
+                "current_analyst_findings": analyst_output.get("findings", [])[:20],
+            }, ensure_ascii=True)
+            async with httpx.AsyncClient(timeout=180.0) as client:
+                resp = await client.post(
+                    f"{VLLM_URL}/v1/chat/completions",
+                    json={
+                        "model": VLLM_MODEL,
+                        "messages": [
+                            {"role": "system", "content": strategy_prompt},
+                            {"role": "user", "content": strategy_user},
+                        ],
+                        "temperature": 0.3,
+                        "max_tokens": 32768,
+                    },
+                )
+                resp.raise_for_status()
+                raw = resp.json()["choices"][0]["message"]["content"]
+                clean = raw.strip()
+                if clean.startswith("```"):
+                    clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
+                if clean.endswith("```"):
+                    clean = clean[:-3]
+                strategies = json.loads(clean.strip())
+                if isinstance(strategies, dict):
+                    strategist_output["competitor_strategies"] = strategies
+                    logger.info(f"[strategy] Produced assessments for {len(strategies)} competitors")
+                else:
+                    strategist_output["competitor_strategies"] = {}
+        except Exception as e:
+            logger.warning(f"[strategy] Dedicated strategy call failed: {e}")
+            strategist_output["competitor_strategies"] = {}
     if strategist_output is None:
         all_traces.append(trace.finish())
         save_trace(run_id, all_traces)
@@ -611,7 +724,7 @@ async def query_wiki(request: dict):
     prompt = build_query_prompt(question, wiki_pages)
 
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             resp = await client.post(
                 f"{VLLM_URL}/v1/chat/completions",
                 json={
@@ -620,7 +733,7 @@ async def query_wiki(request: dict):
                         {"role": "user", "content": prompt},
                     ],
                     "temperature": 0.2,
-                    "max_tokens": 2048,
+                    "max_tokens": 32768,
                 },
             )
             resp.raise_for_status()

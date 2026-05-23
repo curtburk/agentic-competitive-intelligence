@@ -209,14 +209,7 @@ class StrategistOutput(BaseModel):
             "still differentiated, or are competitors closing the gap?"
         )
     )
-    competitor_strategies: dict[str, str] = Field(
-        default_factory=dict,
-        description=(
-            "Inferred AI strategy for each competitor with findings this cycle. "
-            "Key = competitor name, Value = 1-2 paragraph strategy assessment "
-            "covering strategic direction, narrative evolution, and implications for HP."
-        )
-    )
+
 
 
 # ─────────────────────────────────────────────
