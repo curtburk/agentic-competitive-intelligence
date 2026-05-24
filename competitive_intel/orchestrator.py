@@ -201,7 +201,6 @@ async def call_agent(
 
                 # Handle models that use alternative field names
                 if response_model.__name__ == "CollectorOutput":
-                    # Find the sources list regardless of field name
                     if "sources" not in parsed:
                         for key in list(parsed.keys()):
                             val = parsed[key]
@@ -209,7 +208,6 @@ async def call_agent(
                                 parsed["sources"] = val
                                 break
 
-                    # Normalize each source item's field names
                     field_aliases = {
                         "title": ["title", "name", "heading"],
                         "url": ["url", "link", "href", "source_url"],
@@ -234,7 +232,6 @@ async def call_agent(
 
                 # Handle StrategistOutput field type mismatches
                 if response_model.__name__ == "StrategistOutput":
-                    # Remap list names if needed
                     if "positioning_comparisons" not in parsed:
                         for key in list(parsed.keys()):
                             val = parsed[key]
@@ -247,7 +244,13 @@ async def call_agent(
                             if isinstance(val, list) and len(val) > 0 and isinstance(val[0], dict) and any(k in val[0] for k in ["type", "urgency", "threat"]):
                                 parsed["threats_and_opportunities"] = val
                                 break
-                    # Coerce list-typed fields to strings
+                    # Coerce threats_and_opportunities from dict to list if needed
+                    tao = parsed.get("threats_and_opportunities", [])
+                    if isinstance(tao, dict):
+                        parsed["threats_and_opportunities"] = [
+                            {"type": k, "description": v, "urgency": "watch", "affected_verticals": []}
+                            for k, v in tao.items() if isinstance(v, str)
+                        ]
                     # Coerce narrative_health to string
                     nh = parsed.get("narrative_health", "")
                     if not isinstance(nh, str):
@@ -272,21 +275,16 @@ async def call_agent(
                     for finding in parsed.get("findings", []):
                         if not isinstance(finding, dict):
                             continue
-                        # specs_mentioned: model sometimes returns list instead of dict
                         specs = finding.get("specs_mentioned", {})
                         if isinstance(specs, list):
                             finding["specs_mentioned"] = {f"spec_{i}": str(v) for i, v in enumerate(specs)}
                         elif not isinstance(specs, dict):
                             finding["specs_mentioned"] = {}
-
-                        # target_verticals: ensure it's a list
                         verts = finding.get("target_verticals", [])
                         if isinstance(verts, str):
                             finding["target_verticals"] = [verts]
                         elif not isinstance(verts, list):
                             finding["target_verticals"] = []
-
-                        # source_urls: ensure it's a list
                         urls = finding.get("source_urls", [])
                         if isinstance(urls, str):
                             finding["source_urls"] = [urls]
@@ -328,7 +326,6 @@ async def run_pipeline(config: dict) -> dict:
     run_id = str(uuid.uuid4())[:8]
 
     # === PREFLIGHT CHECKS ===
-    # Verify vLLM and SearXNG before running 52 searches
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
@@ -341,7 +338,6 @@ async def run_pipeline(config: dict) -> dict:
                 },
             )
             resp.raise_for_status()
-            raw = resp.json()["choices"][0]["message"]["content"]
             logger.info(f"[preflight] vLLM OK (run {run_id})")
     except Exception as e:
         return {"run_id": run_id, "status": "aborted", "nodes_completed": [],
@@ -354,6 +350,7 @@ async def run_pipeline(config: dict) -> dict:
     except Exception as e:
         return {"run_id": run_id, "status": "aborted", "nodes_completed": [],
                 "reason": f"Preflight: SearXNG failed: {e}"}
+
     previous_summary = load_previous_brief_summary()
     all_traces = []
     result = {"run_id": run_id, "status": "complete", "nodes_completed": []}
@@ -365,7 +362,6 @@ async def run_pipeline(config: dict) -> dict:
     search_failures = 0
     pre_filter_skipped = 0
 
-    # Pull search settings from config
     search_settings = config.get("search_settings", {})
     time_range = search_settings.get("time_range", "week")
     categories = search_settings.get("categories", "general,news,it")
@@ -373,7 +369,6 @@ async def run_pipeline(config: dict) -> dict:
     relevance_keywords = config.get("relevance_keywords", [])
 
     async def _execute_query(query: str):
-        """Run a single search query and collect results."""
         nonlocal search_failures
         queries_executed.append(query)
         trace.tool_calls.append(f"searxng:{query}")
@@ -383,20 +378,15 @@ async def run_pipeline(config: dict) -> dict:
             return []
         return search_result.top_results(max_per_query)
 
-    # Layer 1: Competitor-level queries
     for competitor in config["competitors"]:
-        comp_name = competitor["name"]
         for query in competitor.get("query_templates", []):
             results = await _execute_query(query)
             all_sources.extend(results)
-
-        # Layer 2: Product-specific queries
         for product in competitor.get("products", []):
             for query in product.get("queries", []):
                 results = await _execute_query(query)
                 all_sources.extend(results)
 
-    # Layer 3: Market-wide queries (catch new entrants)
     for query in config.get("market_queries", []):
         results = await _execute_query(query)
         all_sources.extend(results)
@@ -409,7 +399,6 @@ async def run_pipeline(config: dict) -> dict:
         result["reason"] = "SearXNG returned no results"
         return result
 
-    # Layer 4: Pre-filter by relevance keywords (before LLM sees anything)
     all_sources, pre_filter_skipped = pre_filter_results(all_sources, relevance_keywords)
     if pre_filter_skipped > 0:
         logger.info(f"[collector] Pre-filter: kept {len(all_sources)}, skipped {pre_filter_skipped}")
@@ -497,64 +486,9 @@ async def run_pipeline(config: dict) -> dict:
 
     # === NODE 4: STRATEGIST ===
     trace = NodeTrace("strategist", run_id)
-
-    # Load wiki context: competitor profiles, HP specs, previous strategies
-    import glob
-    wiki_root = os.environ.get("WIKI_ROOT", "/data/wiki")
-    wiki_context = {}
-
-    for profile_path in glob.glob(f"{wiki_root}/competitors/*/profile.md"):
-        name = profile_path.split("/")[-2]
-        try:
-            with open(profile_path) as pf:
-                wiki_context[f"profile_{name}"] = pf.read()[:1500]
-        except Exception:
-            pass
-
-    for strat_path in glob.glob(f"{wiki_root}/positioning/strategy-*.md"):
-        name = strat_path.split("/")[-1].replace("strategy-", "").replace(".md", "")
-        try:
-            with open(strat_path) as sf:
-                wiki_context[f"previous_strategy_{name}"] = sf.read()[:1000]
-        except Exception:
-            pass
-
-    for spec_name in ["zgx-fury-specs.md", "zgx-nano-specs.md"]:
-        spec_path = f"{wiki_root}/positioning/{spec_name}"
-        try:
-            with open(spec_path) as sf:
-                wiki_context[f"hp_{spec_name}"] = sf.read()[:1500]
-        except Exception:
-            pass
-
-
-    # Load ALL competitor findings (the actual intelligence)
-    for competitor_dir in glob.glob(f"{wiki_root}/competitors/*/"):
-        name = competitor_dir.rstrip("/").split("/")[-1]
-        findings = sorted(glob.glob(f"{competitor_dir}2026-*.md"))
-        if findings:
-            combined = []
-            for fpath in findings[-10:]:
-                try:
-                    with open(fpath) as ff:
-                        combined.append(ff.read()[:500])
-                except Exception:
-                    pass
-            if combined:
-                wiki_context[f"findings_{name}"] = "\n---\n".join(combined)
-
-    # Load positioning comparisons
-    for vs_path in glob.glob(f"{wiki_root}/positioning/vs-*.md"):
-        name = vs_path.split("/")[-1].replace(".md", "")
-        try:
-            with open(vs_path) as vf:
-                wiki_context[f"positioning_{name}"] = vf.read()[:1000]
-        except Exception:
-            pass
     strategist_input = {
         "analyst_findings": analyst_output,
         "hp_positioning": config["hp_positioning"],
-
     }
     strategist_output = await call_agent(
         system_prompt=strategist_prompt(),
@@ -562,62 +496,6 @@ async def run_pipeline(config: dict) -> dict:
         response_model=StrategistOutput,
         trace=trace,
     )
-
-    # Dedicated strategy inference call - separate from main Strategist
-    if strategist_output is not None:
-        try:
-            strategy_prompt = (
-                "You are a competitive intelligence strategist for HP's AI workstation business.\n"
-                "You will receive wiki data about competitors including their product profiles, "
-                "recent findings, and previous strategy assessments.\n\n"
-                "For EACH competitor listed, produce a 2-3 paragraph strategy assessment covering:\n"
-                "1. Strategic direction: What are they building toward?\n"
-                "2. Narrative evolution: How has their approach changed recently?\n"
-                "3. Implications for HP: Where does this create risk or opportunity?\n\n"
-                "Respond with ONLY a JSON object where each key is a competitor name "
-                "and each value is the strategy assessment string. Example:\n"
-                '{"Dell": "Dell is pursuing...", "AMD": "AMD is positioning..."}'
-            )
-            # Sanitize wiki context: remove control characters that break JSON
-            clean_context = {}
-            for k, v in wiki_context.items():
-                if isinstance(v, str):
-                    clean_context[k] = v.replace("\r", " ").replace("\t", " ").replace("\x00", "")
-                else:
-                    clean_context[k] = v
-            strategy_user = json.dumps({
-                "wiki_context": clean_context,
-                "current_analyst_findings": analyst_output.get("findings", [])[:20],
-            }, ensure_ascii=True)
-            async with httpx.AsyncClient(timeout=180.0) as client:
-                resp = await client.post(
-                    f"{VLLM_URL}/v1/chat/completions",
-                    json={
-                        "model": VLLM_MODEL,
-                        "messages": [
-                            {"role": "system", "content": strategy_prompt},
-                            {"role": "user", "content": strategy_user},
-                        ],
-                        "temperature": 0.3,
-                        "max_tokens": 32768,
-                    },
-                )
-                resp.raise_for_status()
-                raw = resp.json()["choices"][0]["message"]["content"]
-                clean = raw.strip()
-                if clean.startswith("```"):
-                    clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
-                if clean.endswith("```"):
-                    clean = clean[:-3]
-                strategies = json.loads(clean.strip())
-                if isinstance(strategies, dict):
-                    strategist_output["competitor_strategies"] = strategies
-                    logger.info(f"[strategy] Produced assessments for {len(strategies)} competitors")
-                else:
-                    strategist_output["competitor_strategies"] = {}
-        except Exception as e:
-            logger.warning(f"[strategy] Dedicated strategy call failed: {e}")
-            strategist_output["competitor_strategies"] = {}
     if strategist_output is None:
         all_traces.append(trace.finish())
         save_trace(run_id, all_traces)
@@ -667,13 +545,11 @@ async def run_pipeline(config: dict) -> dict:
 
 @app.get("/health")
 async def health():
-    """Health check for the orchestrator."""
     return {"status": "ok", "model": VLLM_MODEL, "searxng": SEARXNG_URL}
 
 
 @app.post("/run")
 async def trigger_run():
-    """Trigger a competitive intelligence run."""
     config = load_config("/config/competitors.yml")
     result = await run_pipeline(config)
     return result
@@ -681,7 +557,6 @@ async def trigger_run():
 
 @app.get("/latest")
 async def get_latest():
-    """Return the most recent weekly brief from the wiki."""
     from pathlib import Path
     briefs_dir = Path(os.environ.get("WIKI_ROOT", "/data/wiki")) / "briefs"
     if not briefs_dir.exists():
@@ -694,7 +569,6 @@ async def get_latest():
 
 @app.get("/traces/{run_id}")
 async def get_traces_endpoint(run_id: str):
-    """Return trace data for a specific run for debugging."""
     traces = load_traces(run_id)
     if not traces:
         return {"status": "no traces found"}
@@ -703,12 +577,6 @@ async def get_traces_endpoint(run_id: str):
 
 @app.post("/query")
 async def query_wiki(request: dict):
-    """
-    Natural language query over the competitive intelligence wiki.
-
-    Body: {"question": "What has Dell announced about data sovereignty?"}
-    Returns: {"answer": "...", "sources": [...]}
-    """
     question = request.get("question", "")
     if not question:
         return {"error": "No question provided"}
@@ -729,9 +597,7 @@ async def query_wiki(request: dict):
                 f"{VLLM_URL}/v1/chat/completions",
                 json={
                     "model": VLLM_MODEL,
-                    "messages": [
-                        {"role": "user", "content": prompt},
-                    ],
+                    "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.2,
                     "max_tokens": 32768,
                 },
@@ -752,18 +618,6 @@ async def query_wiki(request: dict):
 
 @app.post("/enrich")
 async def enrich_endpoint(request: dict):
-    """
-    Enrich a competitor product profile by searching the web,
-    fetching product pages, and extracting structured specs.
-
-    Body: {
-        "competitor": "Dell",
-        "product_name": "Pro Max GB10",
-        "product_tier": "nano",
-        "url": "https://dell.com/..."  (optional, direct product page)
-    }
-    Returns: {"status": "complete", "specs_extracted": 8, ...}
-    """
     competitor = request.get("competitor", "")
     product_name = request.get("product_name", "")
     product_tier = request.get("product_tier", "nano")
@@ -786,17 +640,12 @@ async def enrich_endpoint(request: dict):
 
 @app.get("/provenance/{competitor}/{product_name}")
 async def get_provenance(competitor: str, product_name: str):
-    """
-    Get the provenance map for a specific competitor product.
-    Shows where every claim came from (URL, date, context).
-
-    Example: GET /provenance/Dell/Pro%20Max%20GB300
-    """
     from provenance import load_provenance
     record = load_provenance(competitor, product_name)
     if not record.claims:
         return {"status": "no provenance data", "competitor": competitor, "product_name": product_name}
     return record.model_dump()
+
 
 # ─────────────────────────────────────────────
 # STRATEGY ENDPOINTS (standalone, not part of pipeline)
@@ -806,9 +655,7 @@ async def get_provenance(competitor: str, product_name: str):
 async def strategy_endpoint(request: dict):
     """
     Run a standalone strategy assessment for one competitor.
-
     Body: {"competitor": "dell"}
-    Returns: {"status": "complete", "assessment": "...", "findings_count": 20, ...}
     """
     from strategy import assess_competitor
     competitor = request.get("competitor", "")
@@ -819,9 +666,6 @@ async def strategy_endpoint(request: dict):
 
 @app.post("/strategy/all")
 async def strategy_all_endpoint():
-    """
-    Run strategy assessment for ALL competitors.
-    Takes several minutes. Returns summary of each assessment.
-    """
+    """Run strategy assessment for ALL competitors."""
     from strategy import assess_all_competitors
     return await assess_all_competitors()

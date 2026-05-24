@@ -1,6 +1,6 @@
 # HP vs ASUS
 
-**Last Updated**: 2026-05-23
+**Last Updated**: 2026-05-24
 
 ---
 
@@ -18,4 +18,4 @@
 
 ## Recommended Response
 
-Counter the DGX brand: 'ASUS leverages the DGX Station brand, but that’s a reference design. HP’s ZGX Fury is an enterprise-grade solution built for the specific compliance and security needs of regulated industries. Our 'Compliance by Architecture' ensures data never leaves the device, a guarantee that goes beyond hardware specs.' Highlight vertical expertise: 'ASUS targets professionals broadly. HP targets federal, defense, and healthcare. Our solution is validated for these high-stakes environments, with the support and security protocols they require.'
+Reframe the DGX narrative: 'The DGX Station is a reference design for developers. The ZGX Fury is an enterprise-grade solution for regulated industries. We offer the same performance but with architectural guarantees for data sovereignty and compliance. Don’t settle for a reference design when you need a compliance guarantee.'
