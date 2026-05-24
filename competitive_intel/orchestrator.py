@@ -798,3 +798,30 @@ async def get_provenance(competitor: str, product_name: str):
         return {"status": "no provenance data", "competitor": competitor, "product_name": product_name}
     return record.model_dump()
 
+# ─────────────────────────────────────────────
+# STRATEGY ENDPOINTS (standalone, not part of pipeline)
+# ─────────────────────────────────────────────
+
+@app.post("/strategy")
+async def strategy_endpoint(request: dict):
+    """
+    Run a standalone strategy assessment for one competitor.
+
+    Body: {"competitor": "dell"}
+    Returns: {"status": "complete", "assessment": "...", "findings_count": 20, ...}
+    """
+    from strategy import assess_competitor
+    competitor = request.get("competitor", "")
+    if not competitor:
+        return {"error": "competitor name is required"}
+    return await assess_competitor(competitor)
+
+
+@app.post("/strategy/all")
+async def strategy_all_endpoint():
+    """
+    Run strategy assessment for ALL competitors.
+    Takes several minutes. Returns summary of each assessment.
+    """
+    from strategy import assess_all_competitors
+    return await assess_all_competitors()
