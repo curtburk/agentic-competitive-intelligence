@@ -19,12 +19,62 @@ def slugify(text: str) -> str:
     return text.lower().replace(" ", "-").replace("/", "-")[:60]
 
 
+# Canonical competitor name mapping
+# Maps model-produced variants to the config-defined name
+COMPETITOR_ALIASES = {
+    "dell technologies": "dell",
+    "dell tech": "dell",
+    "msi (via ant pc)": "msi",
+    "msi-(via-ant-pc)": "msi",
+    "msi via ant pc": "msi",
+    "ant pc": "msi",
+    "ant-pc": "msi",
+    "hewlett packard enterprise": "hpe",
+    "general-market-competitors": "general-market",
+    "general market competitors": "general-market",
+}
+
+
+def normalize_competitor(name: str) -> str:
+    """Normalize competitor name to canonical form."""
+    lower = name.lower().strip()
+    if lower in COMPETITOR_ALIASES:
+        return COMPETITOR_ALIASES[lower]
+    return lower
+
+
+def find_existing_urls(competitor_dir: Path) -> set:
+    """Scan existing findings for source URLs to detect duplicates."""
+    urls = set()
+    for f in competitor_dir.glob("2026-*.md"):
+        try:
+            text = f.read_text()
+            for line in text.split("\n"):
+                line = line.strip()
+                if line.startswith("- http"):
+                    urls.add(line[2:].strip())
+        except Exception:
+            pass
+    return urls
+
 def write_finding(finding: CompetitorFinding, run_id: str, run_date: str):
     """Write a single competitor finding as a wiki page."""
-    competitor_dir = WIKI_ROOT / "competitors" / slugify(finding.competitor)
+    canonical = normalize_competitor(finding.competitor)
+    competitor_dir = WIKI_ROOT / "competitors" / slugify(canonical)
     competitor_dir.mkdir(parents=True, exist_ok=True)
 
+    # Dedup: skip if ALL source URLs already exist in prior findings
+    if finding.source_urls:
+        existing_urls = find_existing_urls(competitor_dir)
+        new_urls = [u for u in finding.source_urls if u not in existing_urls]
+        if not new_urls:
+            return None
+
     slug = slugify(finding.summary[:50])
+    filepath = competitor_dir / f"{run_date}-{slug}.md"
+
+    if filepath.exists():
+        return None
     filepath = competitor_dir / f"{run_date}-{slug}.md"
 
     specs_lines = "\n".join(f"- **{k}**: {v}" for k, v in finding.specs_mentioned.items())
