@@ -1,6 +1,6 @@
 # Competitive Intelligence Wiki
 
-**Last updated**: 2026-06-17T22:01:09.390692
+**Last updated**: 2026-06-17T22:31:32.676756
 
 ## Briefs
 
@@ -13,6 +13,7 @@
 
 ## Competitors
 
+- [Acer - Competitor Profile](competitors/acer/profile.md)
 - [AMD announced the Ryzen AI Halo Developer Platform, a compact AI workstation pri](competitors/amd/2026-05-21-amd-announced-the-ryzen-ai-halo-developer-platform.md)
 - [AMD announced the Ryzen AI Max 400 series APUs, verified for up to 192GB of unif](competitors/amd/2026-05-21-amd-announced-the-ryzen-ai-max-400-series-apus,-ve.md)
 - [AMD announced the Ryzen AI Max PRO 400 series APUs, verified for up to 192GB of](competitors/amd/2026-05-21-amd-announced-the-ryzen-ai-max-pro-400-series-apus.md)
@@ -24,6 +25,7 @@
 - [AMD unveiled the Ryzen AI Max PRO 400 Series APUs, designed for AI workstations](competitors/amd/2026-05-21-amd-unveiled-the-ryzen-ai-max-pro-400-series-apus,.md)
 - [AMD unveiled the Ryzen AI Max PRO 400 Series processors, claiming to be the firs](competitors/amd/2026-05-21-amd-unveiled-the-ryzen-ai-max-pro-400-series-proce.md)
 - [AMD is challenging NVIDIA's DGX Spark entry-level AI desktop with a $3,999 Ryzen](competitors/amd/2026-06-17-amd-is-challenging-nvidia's-dgx-spark-entry-level-.md)
+- [AMD - Competitor Profile](competitors/amd/profile.md)
 - [ASUS reported record first-quarter 2026 brand revenue of US$6.19 billion, a 44%](competitors/asus/2026-05-14-asus-reported-record-first-quarter-2026-brand-reve.md)
 - [ASUS is launching the ExpertCenter Pro ET900N G3, a deskside AI supercomputer bu](competitors/asus/2026-05-23-asus-is-launching-the-expertcenter-pro-et900n-g3,-.md)
 - [ASUS is marketing the ExpertCenter Pro ET900N G3 as a 'deskside AI supercomputer](competitors/asus/2026-05-23-asus-is-marketing-the-expertcenter-pro-et900n-g3-a.md)
@@ -83,6 +85,7 @@
 - [Dell launched 'Dell Deskside Agentic AI,' a validated family of solutions for lo](competitors/dell/2026-05-23-dell-launched-'dell-deskside-agentic-ai,'-a-valida.md)
 - [Dell launched its 'Deskside Agentic AI' workstation lineup, featuring the Dell P](competitors/dell/2026-05-23-dell-launched-its-'deskside-agentic-ai'-workstatio.md)
 - [Dell launched the Dell Pro Precision 7 R1, a compact, mountable rack workstation](competitors/dell/2026-05-23-dell-launched-the-dell-pro-precision-7-r1,-a-compa.md)
+- [Dell and AMD announced an expanded collaboration to support AMD Instinct MI350P](competitors/dell/2026-06-17-dell-and-amd-announced-an-expanded-collaboration-t.md)
 - [Dell is strategically shifting toward 'Deskside Agentic AI' products to capture](competitors/dell/2026-06-17-dell-is-strategically-shifting-toward-'deskside-ag.md)
 - [Dell reported $12.3B in quarterly AI server orders, indicating massive financial](competitors/dell/2026-06-17-dell-reported-$12.3b-in-quarterly-ai-server-orders.md)
 - [Dell - Competitor Profile](competitors/dell/profile.md)
@@ -101,6 +104,8 @@
 - [HPE launched a unified 'Private Cloud for the AI Era' stack, consolidating Morph](competitors/hpe/2026-05-14-hpe-launched-a-unified-'private-cloud-for-the-ai-e.md)
 - [HPE launched the ProLiant Compute EL2000, a rugged edge AI infrastructure device](competitors/hpe/2026-05-23-hpe-launched-the-proliant-compute-el2000,-a-rugged.md)
 - [HPE announced new agentic AI innovations with NVIDIA, including the ProLiant DL3](competitors/hpe/2026-06-17-hpe-announced-new-agentic-ai-innovations-with-nvid.md)
+- [HPE announced new capabilities for its Private Cloud AI platform at HPE Discover](competitors/hpe/2026-06-17-hpe-announced-new-capabilities-for-its-private-clo.md)
+- [HPE announced that Vultr, described as the world's largest privately held hypers](competitors/hpe/2026-06-17-hpe-announced-that-vultr,-described-as-the-world's.md)
 - [HPE - Competitor Profile](competitors/hpe/profile.md)
 - [Lenovo is aggressively expanding its AI-ready laptop lineup beyond its high-end](competitors/lenovo/2026-05-14-lenovo-is-aggressively-expanding-its-ai-ready-lapt.md)
 - [Lenovo launched the ThinkPad P16s Gen 4, a mid-range mobile workstation featurin](competitors/lenovo/2026-05-14-lenovo-launched-the-thinkpad-p16s-gen-4,-a-mid-ran.md)
@@ -140,6 +145,7 @@
 - [Lenovo reported that its AI server business has been deployed across more than 5](competitors/lenovo/2026-05-23-lenovo-reported-that-its-ai-server-business-has-be.md)
 - [Lenovo reported that its Infrastructure Solutions Group (ISG) has deployed AI se](competitors/lenovo/2026-05-23-lenovo-reported-that-its-infrastructure-solutions-.md)
 - [Lenovo launched four new AI-driven ThinkEdge solutions for industrial applicatio](competitors/lenovo/2026-05-24-lenovo-launched-four-new-ai-driven-thinkedge-solut.md)
+- [Lenovo launched a new AI mini PC featuring a 12-core CPU and 'Tianxi Claw' techn](competitors/lenovo/2026-06-17-lenovo-launched-a-new-ai-mini-pc-featuring-a-12-co.md)
 - [Lenovo launched the ThinkStation PGX, a small-form-factor workstation powered by](competitors/lenovo/2026-06-17-lenovo-launched-the-thinkstation-pgx,-a-small-form.md)
 - [Lenovo - Competitor Profile](competitors/lenovo/profile.md)
 - [Ant PC launched the XpertStation WS300, a deskside AI workstation built on NVIDI](competitors/msi/2026-05-23-ant-pc-launched-the-xpertstation-ws300,-a-deskside.md)
@@ -166,7 +172,7 @@
 
 ## Positioning
 
-- [Compliance by Architecture](positioning/compliance-by-architecture.md)
+- [acer — Inferred AI Strategy](positioning/strategy-acer.md)
 - [amd — Inferred AI Strategy](positioning/strategy-amd.md)
 - [ant-pc — Inferred AI Strategy](positioning/strategy-ant-pc.md)
 - [asus — Inferred AI Strategy](positioning/strategy-asus.md)
@@ -175,6 +181,7 @@
 - [dell-technologies — Inferred AI Strategy](positioning/strategy-dell-technologies.md)
 - [dell — Inferred AI Strategy](positioning/strategy-dell.md)
 - [general-market-competitors — Inferred AI Strategy](positioning/strategy-general-market-competitors.md)
+- [gigabyte-technology — Inferred AI Strategy](positioning/strategy-gigabyte-technology.md)
 - [gigabyte — Inferred AI Strategy](positioning/strategy-gigabyte.md)
 - [hp — Inferred AI Strategy](positioning/strategy-hp.md)
 - [hpe — Inferred AI Strategy](positioning/strategy-hpe.md)
