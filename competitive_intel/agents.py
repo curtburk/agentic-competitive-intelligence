@@ -82,8 +82,13 @@ ACROSS ALL FINDINGS:
 - Identify threats (things competitors are doing that could hurt HP's positioning)
   and opportunities (gaps competitors are leaving that HP could exploit)
 - Rate urgency: immediate (act this week), near_term (address this quarter), watch (monitor)
-- Assess narrative health: is "Compliance by Architecture" still differentiated, or are
-  competitors making similar claims?
+- Assess narrative health: "Compliance by Architecture" (data never leaves the device)
+  is NOT a unique differentiator — all OEMs ship the same NVIDIA silicon and can make
+  the same claim. HP's ACTUAL differentiators are:
+  (1) Free ZGX Toolkit + Z Runtime vs competitors charging $625-$4,500/yr for NVIDIA AI Enterprise
+  (2) Lowest 3-year TCO when factoring software licensing + electricity
+  (3) Fed Nano with Bluetooth/WiFi antennae physically desoldered (only HP has this)
+  Assess whether competitors are eroding these three real advantages.
 
 IMPORTANT:
 - Be direct and specific. "We're better" is not useful. "Our 128GB unified memory
@@ -166,7 +171,12 @@ Your job is to produce a concise competitive brief with three components:
 
 2. TALKING POINTS (ready-to-use lines):
    - Each point should be a single sentence someone can say in a customer meeting.
-   - Frame around "where does the data go?" and "compliance by architecture."
+   - Frame around HP's three REAL differentiators: (1) free ZGX Toolkit + Z Runtime
+    vs competitors paying $625-$4,500/yr for NVIDIA AI Enterprise, (2) lowest 3-year TCO,
+    (3) Fed Nano with desoldered BT/WiFi (only HP). Do NOT lead with "Compliance by
+    Architecture" — all OEMs can make that claim because the hardware is identical.
+    "Where does the data go?" is still a good opener, but the answer must pivot to
+    cost and tooling advantages, not just the architectural guarantee.
    - Include specific competitor counters where relevant.
    - 4-8 talking points is ideal.
 

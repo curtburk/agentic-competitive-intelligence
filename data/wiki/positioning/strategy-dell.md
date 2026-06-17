@@ -1,6 +1,6 @@
 # dell — Inferred AI Strategy
 
-**Last Updated**: 2026-05-24
+**Last Updated**: 2026-06-17
 
 ---
 

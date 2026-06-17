@@ -1,6 +1,6 @@
 # Competitive Intelligence Wiki
 
-**Last updated**: 2026-05-24T21:59:13.378418
+**Last updated**: 2026-06-17T22:01:09.390692
 
 ## Briefs
 
@@ -9,6 +9,7 @@
 - [Competitive Brief: Week of 2026-05-21](briefs/week-of-2026-05-21.md)
 - [Competitive Brief: Week of 2026-05-23](briefs/week-of-2026-05-23.md)
 - [Competitive Brief: Week of 2026-05-24](briefs/week-of-2026-05-24.md)
+- [Competitive Brief: Week of 2026-06-17](briefs/week-of-2026-06-17.md)
 
 ## Competitors
 
@@ -22,11 +23,13 @@
 - [AMD suggests that switching to a machine running a local LLM via the Ryzen AI Ma](competitors/amd/2026-05-21-amd-suggests-that-switching-to-a-machine-running-a.md)
 - [AMD unveiled the Ryzen AI Max PRO 400 Series APUs, designed for AI workstations](competitors/amd/2026-05-21-amd-unveiled-the-ryzen-ai-max-pro-400-series-apus,.md)
 - [AMD unveiled the Ryzen AI Max PRO 400 Series processors, claiming to be the firs](competitors/amd/2026-05-21-amd-unveiled-the-ryzen-ai-max-pro-400-series-proce.md)
+- [AMD is challenging NVIDIA's DGX Spark entry-level AI desktop with a $3,999 Ryzen](competitors/amd/2026-06-17-amd-is-challenging-nvidia's-dgx-spark-entry-level-.md)
 - [ASUS reported record first-quarter 2026 brand revenue of US$6.19 billion, a 44%](competitors/asus/2026-05-14-asus-reported-record-first-quarter-2026-brand-reve.md)
 - [ASUS is launching the ExpertCenter Pro ET900N G3, a deskside AI supercomputer bu](competitors/asus/2026-05-23-asus-is-launching-the-expertcenter-pro-et900n-g3,-.md)
 - [ASUS is marketing the ExpertCenter Pro ET900N G3 as a 'deskside AI supercomputer](competitors/asus/2026-05-23-asus-is-marketing-the-expertcenter-pro-et900n-g3-a.md)
 - [ASUS launched the Ascent GX10, an ultra-compact desktop AI supercomputer powered](competitors/asus/2026-05-23-asus-launched-the-ascent-gx10,-an-ultra-compact-de.md)
 - [ASUS is positioning the ExpertCenter Pro ET900N G3 as a powerful AI PC built on](competitors/asus/2026-05-24-asus-is-positioning-the-expertcenter-pro-et900n-g3.md)
+- [ASUS launched the ExpertCenter Pro ET900N G3, a deskside AI workstation based on](competitors/asus/2026-06-17-asus-launched-the-expertcenter-pro-et900n-g3,-a-de.md)
 - [Asus - Competitor Profile](competitors/asus/profile.md)
 - [Connect Tech's Sentry-X2 Mini Rugged Edge AI System won 'Best in Show' at XPONEN](competitors/connect-tech/2026-05-15-connect-tech's-sentry-x2-mini-rugged-edge-ai-syste.md)
 - [Corsair entered the professional AI workstation market with the launch of the AI](competitors/corsair/2026-05-23-corsair-entered-the-professional-ai-workstation-ma.md)
@@ -80,6 +83,8 @@
 - [Dell launched 'Dell Deskside Agentic AI,' a validated family of solutions for lo](competitors/dell/2026-05-23-dell-launched-'dell-deskside-agentic-ai,'-a-valida.md)
 - [Dell launched its 'Deskside Agentic AI' workstation lineup, featuring the Dell P](competitors/dell/2026-05-23-dell-launched-its-'deskside-agentic-ai'-workstatio.md)
 - [Dell launched the Dell Pro Precision 7 R1, a compact, mountable rack workstation](competitors/dell/2026-05-23-dell-launched-the-dell-pro-precision-7-r1,-a-compa.md)
+- [Dell is strategically shifting toward 'Deskside Agentic AI' products to capture](competitors/dell/2026-06-17-dell-is-strategically-shifting-toward-'deskside-ag.md)
+- [Dell reported $12.3B in quarterly AI server orders, indicating massive financial](competitors/dell/2026-06-17-dell-reported-$12.3b-in-quarterly-ai-server-orders.md)
 - [Dell - Competitor Profile](competitors/dell/profile.md)
 - [The White House approved $9 billion for spy agencies to acquire cutting-edge AI](competitors/general-market-competitors/2026-05-23-the-white-house-approved-$9-billion-for-spy-agenci.md)
 - [Gigabyte is promoting a 'full-stack' AI infrastructure narrative at COMPUTEX 202](competitors/gigabyte/2026-05-15-gigabyte-is-promoting-a-'full-stack'-ai-infrastruc.md)
@@ -95,6 +100,7 @@
 - [Gigabyte officially shipped the AI TOP ATOM, a desktop system based on the NVIDI](competitors/gigabyte-technology/2026-05-24-gigabyte-officially-shipped-the-ai-top-atom,-a-des.md)
 - [HPE launched a unified 'Private Cloud for the AI Era' stack, consolidating Morph](competitors/hpe/2026-05-14-hpe-launched-a-unified-'private-cloud-for-the-ai-e.md)
 - [HPE launched the ProLiant Compute EL2000, a rugged edge AI infrastructure device](competitors/hpe/2026-05-23-hpe-launched-the-proliant-compute-el2000,-a-rugged.md)
+- [HPE announced new agentic AI innovations with NVIDIA, including the ProLiant DL3](competitors/hpe/2026-06-17-hpe-announced-new-agentic-ai-innovations-with-nvid.md)
 - [HPE - Competitor Profile](competitors/hpe/profile.md)
 - [Lenovo is aggressively expanding its AI-ready laptop lineup beyond its high-end](competitors/lenovo/2026-05-14-lenovo-is-aggressively-expanding-its-ai-ready-lapt.md)
 - [Lenovo launched the ThinkPad P16s Gen 4, a mid-range mobile workstation featurin](competitors/lenovo/2026-05-14-lenovo-launched-the-thinkpad-p16s-gen-4,-a-mid-ran.md)
@@ -134,6 +140,7 @@
 - [Lenovo reported that its AI server business has been deployed across more than 5](competitors/lenovo/2026-05-23-lenovo-reported-that-its-ai-server-business-has-be.md)
 - [Lenovo reported that its Infrastructure Solutions Group (ISG) has deployed AI se](competitors/lenovo/2026-05-23-lenovo-reported-that-its-infrastructure-solutions-.md)
 - [Lenovo launched four new AI-driven ThinkEdge solutions for industrial applicatio](competitors/lenovo/2026-05-24-lenovo-launched-four-new-ai-driven-thinkedge-solut.md)
+- [Lenovo launched the ThinkStation PGX, a small-form-factor workstation powered by](competitors/lenovo/2026-06-17-lenovo-launched-the-thinkstation-pgx,-a-small-form.md)
 - [Lenovo - Competitor Profile](competitors/lenovo/profile.md)
 - [Ant PC launched the XpertStation WS300, a deskside AI workstation built on NVIDI](competitors/msi/2026-05-23-ant-pc-launched-the-xpertstation-ws300,-a-deskside.md)
 - [ANT PC released the XpertStation WS300, a deskside AI workstation powered by the](competitors/msi/2026-05-23-ant-pc-released-the-xpertstation-ws300,-a-deskside.md)
@@ -141,6 +148,7 @@
 - [MSI (branded as ANT PC) launched the XpertStation WS300, a desktop AI system pow](competitors/msi/2026-05-23-msi-(branded-as-ant-pc)-launched-the-xpertstation-.md)
 - [MSI is promoting the EdgeXpert as a desktop AI supercomputer engineered for prof](competitors/msi/2026-05-23-msi-is-promoting-the-edgexpert-as-a-desktop-ai-sup.md)
 - [MSI is marketing the EdgeXpert as a desktop AI supercomputer for professionals,](competitors/msi/2026-05-24-msi-is-marketing-the-edgexpert-as-a-desktop-ai-sup.md)
+- [MSI launched the XpertStation WS300T60L, another GB300-based deskside AI worksta](competitors/msi/2026-06-17-msi-launched-the-xpertstation-ws300t60l,-another-g.md)
 - [MSI - Competitor Profile](competitors/msi/profile.md)
 - [NVIDIA continues to deepen infrastructure partnerships, notably with Dell, to de](competitors/nvidia/2026-05-21-nvidia-continues-to-deepen-infrastructure-partners.md)
 - [NVIDIA continues to deepen partnerships with major infrastructure providers, inc](competitors/nvidia/2026-05-21-nvidia-continues-to-deepen-partnerships-with-major.md)

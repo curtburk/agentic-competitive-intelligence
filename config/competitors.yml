@@ -6,7 +6,7 @@
 competitors:
   # ── FURY COMPETITORS ──────────────────────────
   - name: Dell
-    tier: fury
+    tier: both
     query_templates:
       - "Dell AI workstation product launch 2026"
       - "Dell on-premises inference announcement"
